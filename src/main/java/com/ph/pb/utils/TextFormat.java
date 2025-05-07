@@ -1,6 +1,7 @@
 package com.ph.pb.utils;
 
 import com.google.protobuf.*;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -415,10 +416,12 @@ public class TextFormat {
                     generator.print(unsignedToString((Long) value));
                     break;
                 case WireFormat.WIRETYPE_FIXED32:
-                    generator.print(String.format((Locale) null, "0x%08x", (Integer) value));
+                    String format = String.format((Locale) null, "0x%08x", (Integer) value);
+                    generator.print("\"" + format + "\"");
                     break;
                 case WireFormat.WIRETYPE_FIXED64:
-                    generator.print(String.format((Locale) null, "0x%016x", (Long) value));
+                    String format1 = String.format((Locale) null, "0x%016x", (Long) value);
+                    generator.print("\"" + format1 + "\"");
                     break;
                 case WireFormat.WIRETYPE_LENGTH_DELIMITED:
                     try {
@@ -434,7 +437,12 @@ public class TextFormat {
                         } else {
                             text = "解析不了的，不解析了";
                         }
-                        generator.print(text);
+                        try {
+                            generator.print(StringEscapeUtils.escapeJava(text));
+                        } catch (Exception ex) {
+                            // TODO 转义失败的 记录文字
+                            generator.print("转义失败");
+                        }
                         generator.print("\"");
                     }
                     break;
